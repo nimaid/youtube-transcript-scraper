@@ -27,8 +27,8 @@ def get_channel_videos(channel_id, api_key, max_videos=50, page_token=''):
         
         videos['next_page_token'] = playlist_item_res.nextPageToken
         
-        videos['video_ids'} += [item.contentDetails.videoId for item in playlist_item_res.items]
-        num_videos = len(videos['video_ids'})
+        videos['video_ids'] += [item.contentDetails.videoId for item in playlist_item_res.items]
+        num_videos = len(videos['video_ids'])
         
         num_videos_left = max_videos - num_videos
         if num_videos_left < MAX_VIDS_PER_CALL:
