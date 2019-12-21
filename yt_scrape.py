@@ -1,5 +1,6 @@
 import pyyoutube as _pyt
 import youtube_transcript_api as _yta
+import re as _re
 
 def get_channel_videos(channel_id, api_key, max_videos=50, page_token=''):
     if max_videos <= 0:
@@ -72,9 +73,12 @@ def save_transcripts_to_file(transcripts, filename):
     if npt not in [None, '']:
         filename = npt + '_' + filename
     with open(filename, 'w') as f:
-        text = '\n'.join(transcripts['video_transcripts']).strip()
-        ascii_text = ''.join(i for i in text if ord(i)<128)
-        f.write(ascii_text)
+        text = '\n'.join(transcripts['video_transcripts'])
+        text = text.replace('’', '\'')
+        text = text.replace('—', ' - ')
+        text = text.encode('ascii', 'ignore').decode('utf-8')
+        text = _re.sub(' +', ' ', text)
+        f.write(text)
 
 def save_channel_transcripts(channel_id, api_key, filename, max_videos=50, page_token='', language='en', type_override=None):
     transcripts = get_channel_transcripts(channel_id, api_key, max_videos=max_videos, page_token=page_token, language=language, type_override=type_override)
