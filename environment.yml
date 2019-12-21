@@ -6,5 +6,5 @@ dependencies:
   - pip
   - pip:
     - dataclasses_json
-    - git+https://github.com/nimaid/python-youtube.git@playlist-items-page-token
+    - python-youtube
     - git+https://github.com/nimaid/youtube-transcript-api.git@add-caption-type-option
