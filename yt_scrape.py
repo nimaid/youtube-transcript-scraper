@@ -16,24 +16,28 @@ def get_channel_videos(channel_id, api_key, max_videos=50, page_token=''):
 
     playlist_id = channel_res.items[0].contentDetails.relatedPlaylists.uploads
     
-    video_ids = []
-    while page_token is not None:
-        # TODO: handle pyyoutube.error.PyYouTubeException by returning IDs and page token
-        playlist_item_res = api.get_playlist_items(playlist_id=playlist_id, count=vids_per_call, page_token=page_token)
+    videos = {'video_ids': [], 'next_page_token': page_token}
+
+    while videos['next_page_token'] is not None:
+        try:
+            playlist_item_res = api.get_playlist_items(playlist_id=playlist_id, count=vids_per_call, page_token=videos['next_page_token'])
+        except pyyoutube.error.PyYouTubeException as e:
+            print('YouTube Error: {}'.format(str(e)))
+            return videos
         
-        page_token = playlist_item_res.nextPageToken
+        videos['next_page_token'] = playlist_item_res.nextPageToken
         
-        video_ids += [item.contentDetails.videoId for item in playlist_item_res.items]
-        num_videos = len(video_ids)
+        videos['video_ids'} += [item.contentDetails.videoId for item in playlist_item_res.items]
+        num_videos = len(videos['video_ids'})
         
         num_videos_left = max_videos - num_videos
         if num_videos_left < MAX_VIDS_PER_CALL:
             vids_per_call = num_videos_left
         
-        if len(video_ids) >= max_videos:
+        if num_videos >= max_videos:
             break
 
-    return {'video_ids': video_ids, 'next_page_token': page_token}
+    return videos
     
 def get_transcript(video_id, language='en', type_override=None):
     transcript_object = youtube_transcript_api.YouTubeTranscriptApi.get_transcript(video_id, languages=(language,), type_override=type_override)
