@@ -1,3 +1,3 @@
 # youtube-transcript-scraper
 
-Scrape.
+A tool for scraping transcripts from Youtube videos/channels. (For machine learning.)
