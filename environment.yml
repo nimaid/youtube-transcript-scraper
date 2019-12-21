@@ -1,0 +1,10 @@
+name: yt-scraper
+channels:
+  - defaults
+dependencies:
+  - python=3.7*
+  - pip
+  - pip:
+    - dataclasses_json
+    - git+https://github.com/nimaid/python-youtube.git@playlist-items-page-token
+    - git+https://github.com/nimaid/youtube-transcript-api.git@add-caption-type-option
