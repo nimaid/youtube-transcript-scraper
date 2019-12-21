@@ -22,9 +22,13 @@ def get_channel_videos(channel_id, api_key, max_videos=50, page_token=''):
         try:
             playlist_item_res = api.get_playlist_items(playlist_id=playlist_id, count=vids_per_call, page_token=videos['next_page_token'])
         except pyyoutube.error.PyYouTubeException as e:
-            print('YouTube Error: {}\nCannot get any more video ID\'s, but already got {}'.format(str(e), len(videos['video_ids'])))
-            return videos
-        
+            num_videos = len(videos['video_ids'])
+            if num_videos > 0:
+                print('YouTube Error:', str(e))
+                print('Cannot get any more video ID\'s, but already got', num_videos)
+                return videos
+            else:
+                raise e
         videos['next_page_token'] = playlist_item_res.nextPageToken
         
         videos['video_ids'] += [item.contentDetails.videoId for item in playlist_item_res.items]
