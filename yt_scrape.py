@@ -1,5 +1,5 @@
-import pyyoutube
-import youtube_transcript_api
+import pyyoutube as _pyt
+import youtube_transcript_api as _yta
 
 def get_channel_videos(channel_id, api_key, max_videos=50, page_token=''):
     if max_videos <= 0:
@@ -11,7 +11,7 @@ def get_channel_videos(channel_id, api_key, max_videos=50, page_token=''):
     else:
         vids_per_call = MAX_VIDS_PER_CALL
     
-    api = pyyoutube.Api(api_key=api_key)
+    api = _pyt.Api(api_key=api_key)
     channel_res = api.get_channel_info(channel_id=channel_id)
 
     playlist_id = channel_res.items[0].contentDetails.relatedPlaylists.uploads
@@ -21,7 +21,7 @@ def get_channel_videos(channel_id, api_key, max_videos=50, page_token=''):
     while videos['next_page_token'] is not None:
         try:
             playlist_item_res = api.get_playlist_items(playlist_id=playlist_id, count=vids_per_call, page_token=videos['next_page_token'])
-        except pyyoutube.error.PyYouTubeException as e:
+        except _pyt.error.PyYouTubeException as e:
             num_videos = len(videos['video_ids'])
             if num_videos > 0:
                 print('YouTube Error:', str(e))
@@ -44,12 +44,12 @@ def get_channel_videos(channel_id, api_key, max_videos=50, page_token=''):
     return videos
     
 def get_transcript(video_id, language='en', type_override=None):
-    transcript_object = youtube_transcript_api.YouTubeTranscriptApi.get_transcript(video_id, languages=(language,), type_override=type_override)
+    transcript_object = _yta.YouTubeTranscriptApi.get_transcript(video_id, languages=(language,), type_override=type_override)
     transcript_text = ' '.join([line['text'] for line in transcript_object]).replace('\n', ' ')
     return transcript_text
     
 def get_transcripts(video_ids, language='en', type_override=None):
-    transcripts, temp = youtube_transcript_api.YouTubeTranscriptApi.get_transcripts(video_ids, languages=(language,), continue_after_error=True, type_override=type_override)
+    transcripts, temp = _yta.YouTubeTranscriptApi.get_transcripts(video_ids, languages=(language,), continue_after_error=True, type_override=type_override)
     transcript_objects = [transcripts[id] for id in transcripts.keys()]
     transcript_texts = [' '.join([line['text'] for line in t]).replace('\n', ' ') for t in transcript_objects]
     return transcript_texts
