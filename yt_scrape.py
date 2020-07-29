@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+import argparse
 import pyyoutube as _pyt
 import youtube_transcript_api as _yta
 import re as _re
@@ -63,7 +66,7 @@ def get_transcripts(video_ids, language='en', type_override=None):
     transcript_texts = [' '.join([line['text'] for line in t]).replace('\n', ' ') for t in transcript_objects]
     return transcript_texts
 
-def get_channel_transcripts(channel_id, api_key, max_videos=50, page_token='', language='en', type_override=None):
+def get_channel_transcripts(channel_id, api_key, max_videos=0, page_token='', language='en', type_override=None):
     videos = get_channel_videos(channel_id=channel_id, api_key=api_key, max_videos=max_videos, page_token=page_token)
     transcripts = get_transcripts(videos['video_ids'], language=language, type_override=type_override)
     return {'video_transcripts': transcripts, 'next_page_token': videos['next_page_token']}
@@ -80,6 +83,24 @@ def save_transcripts_to_file(transcripts, filename):
         text = _re.sub(' +', ' ', text)
         f.write(text)
 
-def save_channel_transcripts(channel_id, api_key, filename, max_videos=50, page_token='', language='en', type_override=None):
+def save_channel_transcripts(channel_id, api_key, filename, max_videos=0, page_token='', language='en', type_override=None):
     transcripts = get_channel_transcripts(channel_id, api_key, max_videos=max_videos, page_token=page_token, language=language, type_override=type_override)
     save_transcripts_to_file(transcripts, filename)
+    
+ if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+
+    # channel_id, api_key, filename, max_videos=0, language='en', type_override=None
+    ap.add_argument("-c", "--channel", type=str, required=True,
+        help="ID of the channel to scrape transcripts from")
+    ap.add_argument("-n", "--num_videos", type=int, required=False,
+        help="maximum number of videos to get transcripts for (all if not supplied)")
+    ap.add_argument("-p", "--page_token", type=str, required=False,
+        help="page token used to start somewhere other than the most recent videos")
+    ap.add_argument("-l", "--language", type=str, required=False, choices=["en"], default="en"
+        help="language code (default is [en]glish)")
+    ap.add_argument("-t", "--type", type=str, required=False, choices=["automatic", "manual"], default=None,
+        help="force either automatic or manual transcripts only")
+        
+        
+    args = vars(ap.parse_args())
